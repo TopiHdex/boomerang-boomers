@@ -1,7 +1,10 @@
 import { useOAuth } from '@clerk/expo';
 import { useSignIn } from '@clerk/expo/legacy';
 import { Link, useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
+
+WebBrowser.maybeCompleteAuthSession();
 import {
   ActivityIndicator,
   Alert,
