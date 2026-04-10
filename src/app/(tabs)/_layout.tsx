@@ -9,8 +9,10 @@ export default function TabLayout() {
   return (
     <NativeTabs
       backgroundColor={colors.background}
-      indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}>
+      indicatorColor={colors.accent}
+      tintColor={colors.accentDark}
+      rippleColor={colors.accentLight}
+      labelStyle={{ selected: { color: colors.accentDark } }}>
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Pedidos</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="list.bullet" md="format_list_bulleted" />
