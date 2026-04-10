@@ -1,5 +1,4 @@
-import { Tabs } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import React from 'react';
 
 import { useTheme } from '@/hooks/use-theme';
@@ -8,52 +7,22 @@ export default function TabLayout() {
   const colors = useTheme();
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.text,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: { backgroundColor: colors.background },
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Pedidos',
-          tabBarIcon: ({ color, size }) => (
-            <SymbolView
-              name={{ ios: 'list.bullet', android: 'format_list_bulleted', web: 'list' }}
-              size={size}
-              tintColor={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="perfil"
-        options={{
-          title: 'Perfil',
-          tabBarIcon: ({ color, size }) => (
-            <SymbolView
-              name={{ ios: 'person', android: 'person', web: 'person' }}
-              size={size}
-              tintColor={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="pagos"
-        options={{
-          title: 'Pagos',
-          tabBarIcon: ({ color, size }) => (
-            <SymbolView
-              name={{ ios: 'creditcard', android: 'credit_card', web: 'credit_card' }}
-              size={size}
-              tintColor={color}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+    <NativeTabs
+      backgroundColor={colors.background}
+      indicatorColor={colors.backgroundElement}
+      labelStyle={{ selected: { color: colors.text } }}>
+      <NativeTabs.Trigger name="index">
+        <NativeTabs.Trigger.Label>Pedidos</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="list.bullet" md="format_list_bulleted" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="perfil">
+        <NativeTabs.Trigger.Label>Perfil</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="person" md="person" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="pagos">
+        <NativeTabs.Trigger.Label>Pagos</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="creditcard" md="credit_card" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
