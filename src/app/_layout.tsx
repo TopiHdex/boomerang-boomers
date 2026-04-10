@@ -10,9 +10,11 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
-const posthog = new PostHog(process.env.EXPO_PUBLIC_POSTHOG_API_KEY!, {
-  host: process.env.EXPO_PUBLIC_POSTHOG_HOST,
-});
+const posthog = process.env.EXPO_PUBLIC_POSTHOG_API_KEY
+  ? new PostHog(process.env.EXPO_PUBLIC_POSTHOG_API_KEY, {
+      host: process.env.EXPO_PUBLIC_POSTHOG_HOST,
+    })
+  : null;
 
 function InitialLayout() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -37,7 +39,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <PostHogProvider client={posthog}>
+    <PostHogProvider client={posthog ?? undefined}>
       <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <AnimatedSplashOverlay />
