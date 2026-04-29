@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import { ActivityIndicator, Alert, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useLocationTracker } from '@/components/location-tracker';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors, Spacing } from '@/constants/theme';
@@ -14,13 +15,44 @@ export default function PedidosScreen() {
   const posthog = usePostHog();
   const { isAvailable, isLoading, isUpdating, error, toggle } =
     useDriverAvailability();
+  const {
+    hasSentLocation,
+    permissionStatus,
+    backgroundPermissionStatus,
+    error: locationError,
+    requestPermission,
+    enableBackgroundUpdates,
+    disableBackgroundUpdates,
+  } = useLocationTracker();
 
   const handlePress = useCallback(async () => {
     const next = !isAvailable;
+    if (next && !hasSentLocation) {
+      if (permissionStatus !== 'granted') {
+        const granted = await requestPermission();
+        if (!granted) {
+          Alert.alert(
+            'Ubicación requerida',
+            'Activa el permiso de ubicación para iniciar operaciones.',
+          );
+          return;
+        }
+      }
+      Alert.alert(
+        'Obteniendo ubicación',
+        'Espera un momento mientras enviamos tu ubicación.',
+      );
+      return;
+    }
     try {
       const result = await toggle(next);
       const newState = result?.is_available ?? next;
-      if (newState) posthog?.capture('operations_started');
+      if (newState) {
+        posthog?.capture('operations_started');
+        await enableBackgroundUpdates();
+      } else {
+        await disableBackgroundUpdates();
+      }
       Alert.alert(
         newState ? '¡Operaciones iniciadas!' : '¡Operaciones detenidas!',
       );
@@ -30,10 +62,28 @@ export default function PedidosScreen() {
         'No se pudo actualizar la disponibilidad. Inténtelo nuevamente.',
       );
     }
-  }, [isAvailable, posthog, toggle]);
+  }, [
+    disableBackgroundUpdates,
+    enableBackgroundUpdates,
+    hasSentLocation,
+    isAvailable,
+    permissionStatus,
+    posthog,
+    requestPermission,
+    toggle,
+  ]);
 
+  void backgroundPermissionStatus;
+
+  const needsLocation = !isAvailable && !hasSentLocation;
   const disabled = isLoading || isUpdating;
-  const buttonLabel = isAvailable ? 'Detener Operaciones' : 'Iniciar Operaciones';
+  const buttonLabel = isAvailable
+    ? 'Detener Operaciones'
+    : needsLocation && permissionStatus !== 'granted'
+      ? 'Activar ubicación'
+      : needsLocation
+        ? 'Obteniendo ubicación…'
+        : 'Iniciar Operaciones';
   const statusLabel = isAvailable ? '¡Estás conectado!' : '¡Estás desconectado!';
 
   return (
@@ -71,6 +121,9 @@ export default function PedidosScreen() {
           )}
           {error && !isUpdating && !isLoading && (
             <ThemedText style={styles.errorText}>{error}</ThemedText>
+          )}
+          {locationError && (
+            <ThemedText style={styles.errorText}>{locationError}</ThemedText>
           )}
         </ThemedView>
       </SafeAreaView>

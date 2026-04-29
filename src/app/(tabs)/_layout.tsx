@@ -1,12 +1,14 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import React from 'react';
 
+import { LocationTrackerProvider } from '@/components/location-tracker';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function TabLayout() {
   const colors = useTheme();
 
   return (
+    <LocationTrackerProvider>
     <NativeTabs
       backgroundColor={colors.background}
       indicatorColor={colors.accent}
@@ -26,5 +28,6 @@ export default function TabLayout() {
         <NativeTabs.Trigger.Icon sf="creditcard" md="credit_card" />
       </NativeTabs.Trigger>
     </NativeTabs>
+    </LocationTrackerProvider>
   );
 }
