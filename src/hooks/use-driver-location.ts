@@ -15,7 +15,7 @@ export function useUpdateDriverLocation() {
     async (location: DriverLocation) => {
       const token = await getToken();
       await apiRequest<void>({
-        method: 'PATCH',
+        method: 'POST',
         path: '/driver/location/',
         token,
         data: location,
