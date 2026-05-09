@@ -27,6 +27,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.topihdex.boomerangboomers",
+      "googleServicesFile": "./google-services.json",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
