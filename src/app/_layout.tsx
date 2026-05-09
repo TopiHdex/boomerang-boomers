@@ -25,7 +25,15 @@ function InitialLayout() {
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Protected guard={!isSignedIn}>
                 <Stack.Screen name="(auth)/sign-in" />
-                <Stack.Screen name="(auth)/sign-up" />
+                <Stack.Screen
+                    name="(auth)/sign-up"
+                    options={{
+                        headerBackButtonDisplayMode: "minimal",
+                        headerShown: true,
+                        headerTitle: "",
+                        headerTransparent: true,
+                    }}
+                />
             </Stack.Protected>
             <Stack.Protected guard={isSignedIn}>
                 <Stack.Screen name="(tabs)" />
