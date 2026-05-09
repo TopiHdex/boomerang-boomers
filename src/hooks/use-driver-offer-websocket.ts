@@ -7,7 +7,7 @@ import type { OrderOffer } from "@/types/order";
 
 const WS_BASE = "wss://boomerang-staging-bd7685105325.herokuapp.com";
 
-const enum MessageType {
+enum MessageType {
     NewOffer = "new_offer",
     OfferCanceled = "offer_canceled",
 }
@@ -54,8 +54,10 @@ export function useDriverOfferWebSocket() {
         let active = true;
 
         const ws = new WebSocket(`${WS_BASE}/ws/drivers/${userId}/offers/`);
+        console.log({ ws });
 
         ws.onmessage = (event) => {
+            console.log({ event });
             if (!active) return;
             try {
                 const data = JSON.parse(event.data as string) as DriverOfferMessage;
@@ -78,6 +80,7 @@ export function useDriverOfferWebSocket() {
 
         return () => {
             active = false;
+            console.log("=======\nClosing!\n=======");
             if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
             ws.close();
         };
