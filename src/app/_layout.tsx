@@ -1,7 +1,7 @@
 import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
-import { Redirect, Slot, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import PostHog, { PostHogProvider } from "posthog-react-native";
 import React from "react";
 import { useColorScheme } from "react-native";
@@ -18,21 +18,20 @@ const posthog = process.env.EXPO_PUBLIC_POSTHOG_API_KEY
 
 function InitialLayout() {
     const { isLoaded, isSignedIn } = useAuth();
-    const segments = useSegments();
 
     if (!isLoaded) return null;
 
-    const inAuthGroup = segments[0] === "(auth)";
-
-    if (!isSignedIn && !inAuthGroup) {
-        return <Redirect href="/(auth)/sign-in" />;
-    }
-
-    if (isSignedIn && inAuthGroup) {
-        return <Redirect href="/(tabs)" />;
-    }
-
-    return <Slot />;
+    return (
+        <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={!isSignedIn}>
+                <Stack.Screen name="(auth)/sign-in" />
+                <Stack.Screen name="(auth)/sign-up" />
+            </Stack.Protected>
+            <Stack.Protected guard={isSignedIn}>
+                <Stack.Screen name="(tabs)" />
+            </Stack.Protected>
+        </Stack>
+    );
 }
 
 export default function RootLayout() {
