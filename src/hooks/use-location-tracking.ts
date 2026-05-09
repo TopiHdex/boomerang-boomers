@@ -12,7 +12,9 @@ export function useLocationTracking() {
     const syncToken = useCallback(async () => {
         const token = await getToken();
         if (token) {
-            await SecureStore.setItemAsync(TOKEN_STORE_KEY, token);
+            await SecureStore.setItemAsync(TOKEN_STORE_KEY, token, {
+                keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+            });
         }
     }, [getToken]);
 
