@@ -7,6 +7,8 @@ import React from "react";
 import { useColorScheme } from "react-native";
 
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
+import { OrderOfferSheet } from "@/components/order-offer-sheet";
+import { useDriverOfferWebSocket } from "@/hooks/use-driver-offer-websocket";
 import { useLocationTracking } from "@/hooks/use-location-tracking";
 import "@/tasks/location";
 
@@ -21,27 +23,31 @@ const posthog = process.env.EXPO_PUBLIC_POSTHOG_API_KEY
 function InitialLayout() {
     const { isLoaded, isSignedIn } = useAuth();
     useLocationTracking();
+    const { offer, dismissOffer } = useDriverOfferWebSocket();
 
     if (!isLoaded) return null;
 
     return (
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Protected guard={!isSignedIn}>
-                <Stack.Screen name="(auth)/sign-in" />
-                <Stack.Screen
-                    name="(auth)/sign-up"
-                    options={{
-                        headerBackButtonDisplayMode: "minimal",
-                        headerShown: true,
-                        headerTitle: "",
-                        headerTransparent: true,
-                    }}
-                />
-            </Stack.Protected>
-            <Stack.Protected guard={isSignedIn}>
-                <Stack.Screen name="(tabs)" />
-            </Stack.Protected>
-        </Stack>
+        <>
+            <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Protected guard={!isSignedIn}>
+                    <Stack.Screen name="(auth)/sign-in" />
+                    <Stack.Screen
+                        name="(auth)/sign-up"
+                        options={{
+                            headerBackButtonDisplayMode: "minimal",
+                            headerShown: true,
+                            headerTitle: "",
+                            headerTransparent: true,
+                        }}
+                    />
+                </Stack.Protected>
+                <Stack.Protected guard={isSignedIn}>
+                    <Stack.Screen name="(tabs)" />
+                </Stack.Protected>
+            </Stack>
+            {offer && <OrderOfferSheet offer={offer} onResponded={dismissOffer} />}
+        </>
     );
 }
 
