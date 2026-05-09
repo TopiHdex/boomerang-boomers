@@ -22,7 +22,8 @@ export function usePushNotifications() {
     const { getToken, isSignedIn } = useAuth();
 
     const register = useCallback(async () => {
-        if (!Device.isDevice) return;
+        // iOS simulator cannot receive push notifications — Android emulator can
+        if (Platform.OS === "ios" && !Device.isDevice) return;
 
         await registerAndroidChannel();
 
