@@ -57,6 +57,14 @@
       "@clerk/expo",
       "expo-secure-store",
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#34c64c",
+          "defaultChannel": "default"
+        }
+      ],
+      [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Boomerang necesita tu ubicación para compartirla con clientes durante las entregas.",

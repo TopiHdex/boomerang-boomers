@@ -6,11 +6,24 @@ import PostHog, { PostHogProvider } from "posthog-react-native";
 import React from "react";
 import { useColorScheme } from "react-native";
 
+import * as Notifications from "expo-notifications";
+
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
 import { OrderOfferSheet } from "@/components/order-offer-sheet";
 import { useDriverOfferWebSocket } from "@/hooks/use-driver-offer-websocket";
 import { useLocationTracking } from "@/hooks/use-location-tracking";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 import "@/tasks/location";
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
+    }),
+});
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -22,8 +35,9 @@ const posthog = process.env.EXPO_PUBLIC_POSTHOG_API_KEY
 
 function InitialLayout() {
     const { isLoaded, isSignedIn } = useAuth();
-    useLocationTracking();
     const { offer, dismissOffer } = useDriverOfferWebSocket();
+    useLocationTracking();
+    usePushNotifications();
 
     if (!isLoaded) return null;
 
