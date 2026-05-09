@@ -20,7 +20,9 @@ TaskManager.defineTask(
         const location = locations[0];
         if (!location) return;
 
-        const token = await SecureStore.getItemAsync(TOKEN_STORE_KEY);
+        const token = await SecureStore.getItemAsync(TOKEN_STORE_KEY, {
+            keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+        });
         if (!token) return;
 
         const { latitude, longitude } = location.coords;
