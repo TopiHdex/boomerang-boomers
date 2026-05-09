@@ -42,9 +42,14 @@ export function useLocationTracking() {
     }, [syncToken]);
 
     const stopTracking = useCallback(async () => {
-        const running = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-        if (running) {
-            await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        try {
+            const running = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+            if (running) {
+                await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+            }
+        } catch {
+            // Native task state may be ahead of JS context (hot reload, killed app).
+            // Safe to ignore — OS will clean up the task on next cold start.
         }
         await SecureStore.deleteItemAsync(TOKEN_STORE_KEY);
     }, []);
