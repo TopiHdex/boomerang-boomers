@@ -7,6 +7,8 @@ import React from "react";
 import { useColorScheme } from "react-native";
 
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
+import { useLocationTracking } from "@/hooks/use-location-tracking";
+import "@/tasks/location";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -18,6 +20,7 @@ const posthog = process.env.EXPO_PUBLIC_POSTHOG_API_KEY
 
 function InitialLayout() {
     const { isLoaded, isSignedIn } = useAuth();
+    useLocationTracking();
 
     if (!isLoaded) return null;
 
