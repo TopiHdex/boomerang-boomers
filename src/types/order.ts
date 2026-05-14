@@ -20,10 +20,28 @@ export interface OrderStatusLog {
     order: number;
 }
 
+export interface AddressDetail {
+    id: number;
+    address_line: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    latitude: string | null;
+    longitude: string | null;
+}
+
+export interface DeliveryAddress {
+    id: number;
+    delivery_notes: string;
+    order: number;
+    address_detail: AddressDetail | null;
+}
+
 export interface Order {
     id: number;
     order_items: OrderItem[];
     status_logs: OrderStatusLog[];
+    delivery_address: DeliveryAddress | null;
     created_at: string;
     status: OrderStatus;
     total: string;

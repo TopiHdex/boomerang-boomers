@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { useFocusEffect } from "expo-router";
 
 import { PoliticasProteccionModal } from "@/components/politicas-proteccion";
 import { OrdersList } from "@/components/orders-list";
@@ -15,7 +17,9 @@ export default function PedidosScreen() {
     const colors = useTheme();
     const { isAvailable, isLoading, isToggling, toggleAvailability } = useDriverAvailability();
     const [showPolicies, setShowPolicies] = useState(false);
-    const { activeOrders, orderHistory, isLoading: isOrdersLoading } = useOrders(true);
+    const { activeOrders, orderHistory, isLoading: isOrdersLoading, refetch } = useOrders(true);
+
+    useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
 
     const handleToggle = () => {
         if (isAvailable) {
