@@ -8,7 +8,6 @@ import { useColorScheme } from "react-native";
 
 import * as Notifications from "expo-notifications";
 
-import { AnimatedSplashOverlay } from "@/components/animated-icon";
 import { OrderOfferSheet } from "@/components/order-offer-sheet";
 import { useDriverOfferWebSocket } from "@/hooks/use-driver-offer-websocket";
 import { useLocationTracking } from "@/hooks/use-location-tracking";
@@ -58,6 +57,17 @@ function InitialLayout() {
                 </Stack.Protected>
                 <Stack.Protected guard={isSignedIn}>
                     <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="pedido/[id]" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
+                    <Stack.Screen
+                        name="pedido/report-problem"
+                        options={{
+                            presentation: "formSheet",
+                            headerShown: true,
+                            title: "Informar sobre un problema",
+                            sheetAllowedDetents: [0.5, 0.75],
+                            sheetGrabberVisible: true,
+                        }}
+                    />
                 </Stack.Protected>
             </Stack>
             {offer && <OrderOfferSheet offer={offer} onResponded={dismissOffer} />}
@@ -72,7 +82,6 @@ export default function RootLayout() {
         <PostHogProvider client={posthog ?? undefined}>
             <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
                 <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-                    <AnimatedSplashOverlay />
                     <InitialLayout />
                 </ThemeProvider>
             </ClerkProvider>
