@@ -51,8 +51,8 @@ const STATUS_COLOR: Record<OrderStatus, { bg: string; text: string }> = {
     CO: { bg: "#D1ECF1", text: "#0C5460" },
     EP: { bg: "#FFE2CC", text: "#CC5200" },
     ER: { bg: "#E1D5F4", text: "#59318F" },
-    T:  { bg: "#CCF0F7", text: "#00838F" },
-    N:  { bg: "#D4EDDA", text: "#155724" },
+    T: { bg: "#CCF0F7", text: "#00838F" },
+    N: { bg: "#D4EDDA", text: "#155724" },
 };
 
 type MapApp = "google" | "apple" | "waze";
@@ -65,9 +65,12 @@ const MAP_APPS: Array<{ value: MapApp; label: string }> = [
 
 function buildMapUrl(app: MapApp, lat: number, lng: number): string {
     switch (app) {
-        case "google": return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-        case "apple":  return `maps://?daddr=${lat},${lng}&dirflg=d`;
-        case "waze":   return `waze://?ll=${lat},${lng}&navigate=yes`;
+        case "google":
+            return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+        case "apple":
+            return `maps://?daddr=${lat},${lng}&dirflg=d`;
+        case "waze":
+            return `waze://?ll=${lat},${lng}&navigate=yes`;
     }
 }
 
@@ -144,9 +147,7 @@ function StatusBadge({ status }: { status: OrderStatus }) {
     const color = STATUS_COLOR[status];
     return (
         <View style={[badgeStyles.badge, { backgroundColor: color.bg }]}>
-            <Text style={[badgeStyles.text, { color: color.text }]}>
-                {STATUS_LABELS[status]}
-            </Text>
+            <Text style={[badgeStyles.text, { color: color.text }]}>{STATUS_LABELS[status]}</Text>
         </View>
     );
 }
@@ -205,7 +206,9 @@ export default function PedidoDetalleScreen() {
         }
     }, [orderId]);
 
-    useEffect(() => { fetchDetail(); }, [fetchDetail]);
+    useEffect(() => {
+        fetchDetail();
+    }, [fetchDetail]);
 
     const updateStatus = async (status: OrderStatus) => {
         const token = await getTokenRef.current();
@@ -259,9 +262,16 @@ export default function PedidoDetalleScreen() {
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
                     {/* Client */}
                     <View style={[styles.section, { backgroundColor: colors.backgroundElement }]}>
-                        <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Cliente</Text>
+                        <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+                            Cliente
+                        </Text>
                         <View style={styles.clientRow}>
-                            <View style={[styles.avatar, { backgroundColor: colors.backgroundSelected }]}>
+                            <View
+                                style={[
+                                    styles.avatar,
+                                    { backgroundColor: colors.backgroundSelected },
+                                ]}
+                            >
                                 <Text style={styles.avatarText}>👤</Text>
                             </View>
                             <Text style={[styles.clientName, { color: colors.text }]}>
@@ -272,10 +282,18 @@ export default function PedidoDetalleScreen() {
 
                     {/* Business */}
                     {business && (
-                        <View style={[styles.section, { backgroundColor: colors.backgroundElement }]}>
-                            <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>Restaurante</Text>
-                            <Text style={[styles.businessName, { color: colors.text }]}>{business.name}</Text>
-                            <Text style={[styles.businessAddr, { color: colors.textSecondary }]}>{businessAddress}</Text>
+                        <View
+                            style={[styles.section, { backgroundColor: colors.backgroundElement }]}
+                        >
+                            <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
+                                Restaurante
+                            </Text>
+                            <Text style={[styles.businessName, { color: colors.text }]}>
+                                {business.name}
+                            </Text>
+                            <Text style={[styles.businessAddr, { color: colors.textSecondary }]}>
+                                {businessAddress}
+                            </Text>
                             {business.latitude != null && business.longitude != null && (
                                 <MapAppSelector lat={business.latitude} lng={business.longitude} />
                             )}
@@ -284,7 +302,9 @@ export default function PedidoDetalleScreen() {
 
                     {/* Delivery address — only when en trayecto */}
                     {order.status === "T" && order.delivery_address?.address_detail && (
-                        <View style={[styles.section, { backgroundColor: colors.backgroundElement }]}>
+                        <View
+                            style={[styles.section, { backgroundColor: colors.backgroundElement }]}
+                        >
                             <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
                                 Dirección de entrega
                             </Text>
@@ -296,7 +316,9 @@ export default function PedidoDetalleScreen() {
                                 order.delivery_address.address_detail.longitude != null && (
                                     <MapAppSelector
                                         lat={Number(order.delivery_address.address_detail.latitude)}
-                                        lng={Number(order.delivery_address.address_detail.longitude)}
+                                        lng={Number(
+                                            order.delivery_address.address_detail.longitude,
+                                        )}
                                     />
                                 )}
                         </View>
@@ -304,7 +326,9 @@ export default function PedidoDetalleScreen() {
 
                     {/* Order items */}
                     {order.order_items.length > 0 && (
-                        <View style={[styles.section, { backgroundColor: colors.backgroundElement }]}>
+                        <View
+                            style={[styles.section, { backgroundColor: colors.backgroundElement }]}
+                        >
                             <Text style={[styles.sectionHeader, { color: colors.textSecondary }]}>
                                 Detalles del pedido
                             </Text>
@@ -321,8 +345,15 @@ export default function PedidoDetalleScreen() {
                                     </Text>
                                 </View>
                             ))}
-                            <View style={[styles.totalRow, { borderTopColor: colors.backgroundSelected }]}>
-                                <Text style={[styles.totalLabel, { color: colors.text }]}>Total</Text>
+                            <View
+                                style={[
+                                    styles.totalRow,
+                                    { borderTopColor: colors.backgroundSelected },
+                                ]}
+                            >
+                                <Text style={[styles.totalLabel, { color: colors.text }]}>
+                                    Total
+                                </Text>
                                 <Text style={[styles.totalVal, { color: colors.text }]}>
                                     ${parseFloat(order.total).toFixed(2)}
                                 </Text>
@@ -338,26 +369,36 @@ export default function PedidoDetalleScreen() {
                 >
                     {canPickUp && (
                         <TouchableOpacity
-                            style={[styles.actionBtn, { backgroundColor: colors.accent }, isUpdating && styles.disabled]}
+                            style={[
+                                styles.actionBtn,
+                                { backgroundColor: colors.accent },
+                                isUpdating && styles.disabled,
+                            ]}
                             onPress={() => updateStatus("T")}
                             disabled={isUpdating}
                         >
-                            {isUpdating
-                                ? <ActivityIndicator color="#fff" />
-                                : <Text style={styles.actionBtnText}>He recogido el pedido</Text>
-                            }
+                            {isUpdating ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <Text style={styles.actionBtnText}>He recogido el pedido</Text>
+                            )}
                         </TouchableOpacity>
                     )}
                     {canDeliver && (
                         <TouchableOpacity
-                            style={[styles.actionBtn, { backgroundColor: "#22c55e" }, isUpdating && styles.disabled]}
+                            style={[
+                                styles.actionBtn,
+                                { backgroundColor: "#22c55e" },
+                                isUpdating && styles.disabled,
+                            ]}
                             onPress={() => updateStatus("N")}
                             disabled={isUpdating}
                         >
-                            {isUpdating
-                                ? <ActivityIndicator color="#fff" />
-                                : <Text style={styles.actionBtnText}>He entregado el pedido</Text>
-                            }
+                            {isUpdating ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <Text style={styles.actionBtnText}>He entregado el pedido</Text>
+                            )}
                         </TouchableOpacity>
                     )}
                     {isDelivered && (
@@ -367,7 +408,9 @@ export default function PedidoDetalleScreen() {
                     )}
                     <TouchableOpacity
                         style={[styles.reportBtn, { borderColor: colors.backgroundSelected }]}
-                        onPress={() => router.push(`/pedido/report-problem?orderId=${orderId}` as never)}
+                        onPress={() =>
+                            router.push(`/pedido/report-problem?orderId=${orderId}` as never)
+                        }
                     >
                         <Text style={[styles.reportBtnText, { color: colors.textSecondary }]}>
                             ⚠️ Informar sobre un problema
@@ -385,9 +428,20 @@ const styles = StyleSheet.create({
     scroll: { flex: 1 },
     scrollContent: { padding: Spacing.three, gap: Spacing.three },
     section: { borderRadius: 14, padding: Spacing.three, gap: Spacing.two },
-    sectionHeader: { fontSize: 12, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.5 },
+    sectionHeader: {
+        fontSize: 12,
+        fontWeight: "600",
+        textTransform: "uppercase",
+        letterSpacing: 0.5,
+    },
     clientRow: { flexDirection: "row", alignItems: "center", gap: Spacing.two },
-    avatar: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
+    avatar: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: "center",
+        justifyContent: "center",
+    },
     avatarText: { fontSize: 18 },
     clientName: { fontSize: 15, fontWeight: "500" },
     businessName: { fontSize: 16, fontWeight: "700" },
@@ -409,7 +463,12 @@ const styles = StyleSheet.create({
     actionBtn: { borderRadius: 12, paddingVertical: 14, alignItems: "center" },
     actionBtnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
     disabled: { opacity: 0.6 },
-    completedBanner: { borderRadius: 12, paddingVertical: 14, alignItems: "center", backgroundColor: "#D4EDDA" },
+    completedBanner: {
+        borderRadius: 12,
+        paddingVertical: 14,
+        alignItems: "center",
+        backgroundColor: "#D4EDDA",
+    },
     completedText: { fontSize: 16, fontWeight: "600", color: "#155724" },
     reportBtn: { borderRadius: 10, paddingVertical: 10, alignItems: "center", borderWidth: 1 },
     reportBtnText: { fontSize: 14 },

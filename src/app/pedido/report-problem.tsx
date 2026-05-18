@@ -26,9 +26,7 @@ export default function ReportProblemScreen() {
 
     const toggle = (problem: string) =>
         setSelected((prev) =>
-            prev.includes(problem)
-                ? prev.filter((p) => p !== problem)
-                : [...prev, problem],
+            prev.includes(problem) ? prev.filter((p) => p !== problem) : [...prev, problem],
         );
 
     const handleSubmit = () => {
