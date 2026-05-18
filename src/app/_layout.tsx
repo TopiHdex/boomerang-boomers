@@ -2,17 +2,18 @@ import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import PostHog, { PostHogProvider } from "posthog-react-native";
 import React from "react";
 import { useColorScheme } from "react-native";
-
 import * as Notifications from "expo-notifications";
-
 import { OrderOfferSheet } from "@/components/order-offer-sheet";
 import { useDriverOfferWebSocket } from "@/hooks/use-driver-offer-websocket";
 import { useLocationTracking } from "@/hooks/use-location-tracking";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 import "@/tasks/location";
+
+WebBrowser.maybeCompleteAuthSession();
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -57,7 +58,10 @@ function InitialLayout() {
                 </Stack.Protected>
                 <Stack.Protected guard={isSignedIn}>
                     <Stack.Screen name="(tabs)" />
-                    <Stack.Screen name="pedido/[id]" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
+                    <Stack.Screen
+                        name="pedido/[id]"
+                        options={{ headerShown: true, headerBackButtonDisplayMode: "minimal" }}
+                    />
                     <Stack.Screen
                         name="pedido/report-problem"
                         options={{

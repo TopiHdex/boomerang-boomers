@@ -1,5 +1,13 @@
 import React, { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+    ActivityIndicator,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useFocusEffect } from "expo-router";
@@ -19,7 +27,11 @@ export default function PedidosScreen() {
     const [showPolicies, setShowPolicies] = useState(false);
     const { activeOrders, orderHistory, isLoading: isOrdersLoading, refetch } = useOrders(true);
 
-    useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
+    useFocusEffect(
+        useCallback(() => {
+            refetch();
+        }, [refetch]),
+    );
 
     const handleToggle = () => {
         if (isAvailable) {

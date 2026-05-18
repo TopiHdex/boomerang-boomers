@@ -20,8 +20,8 @@ const STATUS_COLOR: Record<OrderStatus, { bg: string; text: string }> = {
     CO: { bg: "#D1ECF1", text: "#0C5460" },
     EP: { bg: "#FFE2CC", text: "#CC5200" },
     ER: { bg: "#E1D5F4", text: "#59318F" },
-    T:  { bg: "#CCF0F7", text: "#00838F" },
-    N:  { bg: "#D4EDDA", text: "#155724" },
+    T: { bg: "#CCF0F7", text: "#00838F" },
+    N: { bg: "#D4EDDA", text: "#155724" },
 };
 
 function formatDate(dateString: string) {
@@ -95,10 +95,15 @@ function OrderItemCard({ order, isActive }: OrderItemCardProps) {
 
                     {order.order_items.length > 0 && (
                         <View style={styles.itemsSection}>
-                            <Text style={[styles.itemsTitle, { color: colors.text }]}>Artículos:</Text>
+                            <Text style={[styles.itemsTitle, { color: colors.text }]}>
+                                Artículos:
+                            </Text>
                             {order.order_items.map((item) => (
                                 <View key={item.id} style={styles.lineItem}>
-                                    <Text style={[styles.itemName, { color: colors.text }]} numberOfLines={1}>
+                                    <Text
+                                        style={[styles.itemName, { color: colors.text }]}
+                                        numberOfLines={1}
+                                    >
                                         {item.product.name}
                                     </Text>
                                     <Text style={[styles.itemQty, { color: colors.textSecondary }]}>
@@ -115,12 +120,21 @@ function OrderItemCard({ order, isActive }: OrderItemCardProps) {
                     <TouchableOpacity
                         style={[
                             styles.detailBtn,
-                            { backgroundColor: isActive ? colors.accent : colors.backgroundSelected },
+                            {
+                                backgroundColor: isActive
+                                    ? colors.accent
+                                    : colors.backgroundSelected,
+                            },
                         ]}
                         onPress={() => router.push(`/pedido/${order.id}` as never)}
                         activeOpacity={0.8}
                     >
-                        <Text style={[styles.detailBtnText, { color: isActive ? "#fff" : colors.text }]}>
+                        <Text
+                            style={[
+                                styles.detailBtnText,
+                                { color: isActive ? "#fff" : colors.text },
+                            ]}
+                        >
                             Ver detalle
                         </Text>
                     </TouchableOpacity>
@@ -136,14 +150,20 @@ interface OrdersListProps {
     isLoading?: boolean;
 }
 
-export function OrdersList({ activeOrders = [], orderHistory = [], isLoading = false }: OrdersListProps) {
+export function OrdersList({
+    activeOrders = [],
+    orderHistory = [],
+    isLoading = false,
+}: OrdersListProps) {
     const colors = useTheme();
 
     if (isLoading) {
         return (
             <View style={styles.emptyState}>
                 <ActivityIndicator color={colors.accent} />
-                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Cargando pedidos...</Text>
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                    Cargando pedidos...
+                </Text>
             </View>
         );
     }
@@ -151,7 +171,9 @@ export function OrdersList({ activeOrders = [], orderHistory = [], isLoading = f
     if (activeOrders.length === 0 && orderHistory.length === 0) {
         return (
             <View style={styles.emptyState}>
-                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>No hay pedidos disponibles</Text>
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                    No hay pedidos disponibles
+                </Text>
             </View>
         );
     }
@@ -163,7 +185,9 @@ export function OrdersList({ activeOrders = [], orderHistory = [], isLoading = f
         <View style={styles.container}>
             {activeOrders.length > 0 && (
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Pedidos Activos</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                        Pedidos Activos
+                    </Text>
                     {activeOrders.map((order) => (
                         <OrderItemCard key={order.id} order={order} isActive />
                     ))}
@@ -172,7 +196,9 @@ export function OrdersList({ activeOrders = [], orderHistory = [], isLoading = f
 
             {orderHistory.length > 0 && (
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Historial de Pedidos</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                        Historial de Pedidos
+                    </Text>
                     {historySlice.map((order) => (
                         <OrderItemCard key={order.id} order={order} isActive={false} />
                     ))}

@@ -1,7 +1,9 @@
-import { useOAuth } from "@clerk/expo";
+import { useSSO } from "@clerk/expo";
 import { useSignIn } from "@clerk/expo/legacy";
+import * as AuthSession from "expo-auth-session";
 import { Link, useRouter } from "expo-router";
-import React, { useState } from "react";
+import * as WebBrowser from "expo-web-browser";
+import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -18,9 +20,20 @@ import { ThemedView } from "@/components/themed-view";
 import { Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 
+function useWarmUpBrowser() {
+    useEffect(() => {
+        if (Platform.OS !== "android") return;
+        void WebBrowser.warmUpAsync();
+        return () => {
+            void WebBrowser.coolDownAsync();
+        };
+    }, []);
+}
+
 export default function SignInScreen() {
+    useWarmUpBrowser();
     const { isLoaded, signIn, setActive } = useSignIn();
-    const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
+    const { startSSOFlow } = useSSO();
     const router = useRouter();
     const colors = useTheme();
     const [email, setEmail] = useState("");
@@ -47,7 +60,13 @@ export default function SignInScreen() {
     const handleGoogleSignIn = async () => {
         setIsLoading(true);
         try {
-            const { createdSessionId, setActive: setActiveSession } = await startOAuthFlow();
+            const redirectUrl = AuthSession.makeRedirectUri({
+                path: "oauth-native-callback",
+            });
+            const { createdSessionId, setActive: setActiveSession } = await startSSOFlow({
+                strategy: "oauth_google",
+                redirectUrl,
+            });
             if (createdSessionId && setActiveSession) {
                 await setActiveSession({ session: createdSessionId });
             }
