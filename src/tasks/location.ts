@@ -3,10 +3,10 @@ import * as TaskManager from "expo-task-manager";
 
 import type { LocationObject } from "expo-location";
 
+import { API_BASE } from "@/lib/api";
+
 export const LOCATION_TASK_NAME = "background-location-task";
 export const TOKEN_STORE_KEY = "boomerang_location_token";
-
-const API_BASE = "https://boomerang-staging-bd7685105325.herokuapp.com/api";
 
 TaskManager.defineTask(
     LOCATION_TASK_NAME,

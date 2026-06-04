@@ -2,10 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@clerk/expo";
 
-import { apiRequest } from "@/lib/api";
+import { apiRequest, WS_BASE } from "@/lib/api";
 import type { OrderOffer } from "@/types/order";
-
-const WS_BASE = "wss://boomerang-staging-bd7685105325.herokuapp.com";
 
 enum MessageType {
     NewOffer = "new_offer",
