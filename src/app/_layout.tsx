@@ -1,13 +1,22 @@
 import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
+import {
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+    useFonts,
+} from "@expo-google-fonts/poppins";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import * as WebBrowser from "expo-web-browser";
 import PostHog, { PostHogProvider } from "posthog-react-native";
-import React, { useCallback } from "react";
-import { useColorScheme } from "react-native";
+import React, { useCallback, useEffect } from "react";
+import { Text, TextInput, useColorScheme } from "react-native";
 import * as Notifications from "expo-notifications";
+import { Poppins } from "@/constants/theme";
 import { OrderOfferSheet } from "@/components/order-offer-sheet";
 import { useDriverOfferWebSocket } from "@/hooks/use-driver-offer-websocket";
 import { useLocationTracking } from "@/hooks/use-location-tracking";
@@ -17,6 +26,17 @@ import { queryKeys } from "@/lib/query-keys";
 import "@/tasks/location";
 
 WebBrowser.maybeCompleteAuthSession();
+SplashScreen.preventAutoHideAsync();
+
+// Default every Text/TextInput to Poppins. Explicit `style` on a component still
+// wins, so weighted styles (Poppins.bold, etc.) override this base family.
+const withDefaultFont = (Component: typeof Text | typeof TextInput) => {
+    const c = Component as unknown as { defaultProps?: { style?: unknown } };
+    c.defaultProps = c.defaultProps ?? {};
+    c.defaultProps.style = [{ fontFamily: Poppins.regular }, c.defaultProps.style];
+};
+withDefaultFont(Text);
+withDefaultFont(TextInput);
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -93,6 +113,21 @@ function InitialLayout() {
 
 export default function RootLayout() {
     const colorScheme = useColorScheme();
+    const [fontsLoaded, fontError] = useFonts({
+        Poppins_400Regular,
+        Poppins_500Medium,
+        Poppins_600SemiBold,
+        Poppins_700Bold,
+    });
+
+    useEffect(() => {
+        if (fontsLoaded || fontError) {
+            SplashScreen.hideAsync();
+        }
+    }, [fontsLoaded, fontError]);
+
+    // Keep the splash up until fonts resolve so text never flashes in a fallback.
+    if (!fontsLoaded && !fontError) return null;
 
     return (
         <PostHogProvider client={posthog ?? undefined}>

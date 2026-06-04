@@ -6,34 +6,38 @@ import React, { useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    ImageBackground,
     KeyboardAvoidingView,
     Platform,
     Pressable,
+    ScrollView,
     StyleSheet,
+    Text,
     TextInput,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Spacing } from "@/constants/theme";
-import { useTheme } from "@/hooks/use-theme";
+import LogoWhite from "@/assets/images/logo-white.svg";
+import { AuthColors, Poppins, Radius, Spacing } from "@/constants/theme";
 
 export default function SignUpScreen() {
     const { isLoaded, signUp, setActive } = useSignUp();
     const { joinWaitlist } = useClerk();
     const router = useRouter();
-    const colors = useTheme();
     const isSignUpEnabled = useFeatureFlag("sign-up");
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-    const isButtonDisabled = isLoading || !isLoaded || isSignUpEnabled === undefined;
+    const disabled = isLoading || !isLoaded || isSignUpEnabled === undefined;
 
     const handleSubmit = async () => {
         if (!isLoaded) return;
         setIsLoading(true);
+        setErrorMsg(null);
         try {
             if (isSignUpEnabled) {
                 const result = await signUp.create({ emailAddress: email, password });
@@ -44,118 +48,167 @@ export default function SignUpScreen() {
             } else {
                 await joinWaitlist({ emailAddress: email });
                 Alert.alert("¡Listo!", "Te hemos agregado a la lista de espera.");
+                setEmail("");
             }
         } catch (err) {
-            const message = err instanceof Error ? err.message : "Error al registrarse";
-            Alert.alert("Error", message);
+            setErrorMsg(err instanceof Error ? err.message : "Error al registrarse");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <ThemedView style={styles.container}>
-            <SafeAreaView style={styles.inner}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={styles.form}
+        <ImageBackground
+            source={require("@/assets/images/fruits.png")}
+            style={styles.bg}
+            imageStyle={styles.bgImage}
+            resizeMode="cover"
+        >
+            <KeyboardAvoidingView
+                style={styles.flex}
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+            >
+                <ScrollView
+                    style={styles.flex}
+                    contentContainerStyle={styles.scrollContent}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
                 >
-                    <ThemedText type="subtitle">Tu mayordomo personal</ThemedText>
-                    <TextInput
-                        style={[
-                            styles.input,
-                            {
-                                borderColor: colors.backgroundSelected,
-                                color: colors.text,
-                                backgroundColor: colors.backgroundElement,
-                            },
-                        ]}
-                        placeholder="Tu correo electrónico"
-                        placeholderTextColor={colors.textSecondary}
-                        value={email}
-                        onChangeText={setEmail}
-                        autoCapitalize="none"
-                        keyboardType="email-address"
-                        autoComplete="email"
-                    />
-                    {isSignUpEnabled && (
-                        <TextInput
-                            style={[
-                                styles.input,
-                                {
-                                    borderColor: colors.backgroundSelected,
-                                    color: colors.text,
-                                    backgroundColor: colors.backgroundElement,
-                                },
-                            ]}
-                            placeholder="Tu contraseña"
-                            placeholderTextColor={colors.textSecondary}
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                            autoComplete="new-password"
-                        />
-                    )}
-                    <Pressable
-                        style={[
-                            styles.button,
-                            { backgroundColor: colors.accent },
-                            isButtonDisabled && styles.buttonDisabled,
-                        ]}
-                        onPress={handleSubmit}
-                        disabled={isButtonDisabled}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator color={colors.accentDark} />
-                        ) : (
-                            <ThemedText type="default" themeColor="accentDark">
-                                {isSignUpEnabled ? "Registrarse" : "Unirse a la lista de espera"}
-                            </ThemedText>
+                    <SafeAreaView style={styles.header} edges={["top"]}>
+                        <LogoWhite width={82} height={56} />
+                    </SafeAreaView>
+                    <View style={styles.form}>
+                        <Text style={styles.welcome}>Tu mayordomo personal</Text>
+
+                        <View style={styles.field}>
+                            <Text style={styles.label}>Correo electrónico</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="hola@boomerang.com"
+                                placeholderTextColor={AuthColors.gray}
+                                value={email}
+                                onChangeText={setEmail}
+                                autoCapitalize="none"
+                                keyboardType="email-address"
+                                autoComplete="email"
+                            />
+                        </View>
+
+                        {isSignUpEnabled && (
+                            <View style={styles.field}>
+                                <Text style={styles.label}>Contraseña</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Tu contraseña"
+                                    placeholderTextColor={AuthColors.gray}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry
+                                    autoComplete="new-password"
+                                />
+                            </View>
                         )}
-                    </Pressable>
-                    <Link href="/(auth)/sign-in" asChild>
-                        <Pressable style={styles.linkButton}>
-                            <ThemedText type="small" themeColor="textSecondary">
-                                ¿Ya tienes una cuenta?{" "}
-                            </ThemedText>
-                            <ThemedText type="smallBold" themeColor="accent">
-                                Inicia sesión
-                            </ThemedText>
+
+                        {errorMsg && <Text style={styles.errorMsg}>{errorMsg}</Text>}
+
+                        <Pressable
+                            style={[styles.submitBtn, disabled && styles.disabled]}
+                            onPress={handleSubmit}
+                            disabled={disabled}
+                        >
+                            {isLoading ? (
+                                <ActivityIndicator color={AuthColors.white} />
+                            ) : (
+                                <Text style={styles.submitBtnText}>
+                                    {isSignUpEnabled
+                                        ? "Registrarse"
+                                        : "Unirse a la lista de espera"}
+                                </Text>
+                            )}
                         </Pressable>
-                    </Link>
-                </KeyboardAvoidingView>
-            </SafeAreaView>
-        </ThemedView>
+
+                        <Link href="/(auth)/sign-in" asChild>
+                            <Pressable style={styles.signInLink}>
+                                <Text style={styles.signInLinkText}>
+                                    ¿Ya tienes una cuenta?{" "}
+                                    <Text style={styles.signInLinkAccent}>Inicia sesión</Text>
+                                </Text>
+                            </Pressable>
+                        </Link>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </ImageBackground>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
-    inner: { flex: 1 },
-    form: {
-        flex: 1,
+    bg: { flex: 1, backgroundColor: AuthColors.main },
+    bgImage: { top: -200 },
+    flex: { flex: 1 },
+    scrollContent: { flexGrow: 1 },
+    header: {
+        alignItems: "center",
         justifyContent: "center",
-        paddingHorizontal: Spacing.four,
-        gap: Spacing.two,
+        paddingVertical: Spacing.five,
     },
+    form: {
+        backgroundColor: AuthColors.background,
+        borderTopLeftRadius: Radius.xl,
+        borderTopRightRadius: Radius.xl,
+        padding: 32,
+        paddingTop: 43,
+        gap: Spacing.three,
+    },
+    welcome: {
+        color: AuthColors.font,
+        fontSize: 25,
+        fontFamily: Poppins.bold,
+        lineHeight: 38,
+        marginBottom: Spacing.three,
+    },
+    field: { gap: 6 },
+    label: { color: AuthColors.darkGray, fontSize: 13, fontFamily: Poppins.medium },
     input: {
         height: 48,
         borderWidth: 1,
-        borderRadius: 8,
+        borderColor: AuthColors.lightGray,
+        borderRadius: Radius.sm,
         paddingHorizontal: Spacing.three,
         fontSize: 16,
+        color: AuthColors.font,
+        backgroundColor: AuthColors.white,
+        fontFamily: Poppins.regular,
     },
-    button: {
-        height: 48,
-        borderRadius: 8,
+    errorMsg: {
+        color: AuthColors.redFont,
+        backgroundColor: AuthColors.redBg,
+        borderColor: AuthColors.redOutline,
+        borderWidth: 1,
+        borderRadius: Radius.sm,
+        padding: Spacing.two,
+        fontSize: 13,
+        fontFamily: Poppins.regular,
+    },
+    submitBtn: {
+        height: 52,
+        borderRadius: Radius.md,
+        backgroundColor: AuthColors.main,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: Spacing.two,
+        marginTop: Spacing.one,
     },
-    buttonDisabled: { opacity: 0.6 },
-    linkButton: {
-        flexDirection: "row",
-        justifyContent: "center",
-        marginTop: Spacing.two,
+    submitBtnText: {
+        color: AuthColors.white,
+        fontSize: 18,
+        fontFamily: Poppins.bold,
     },
+    signInLink: { alignSelf: "center", padding: Spacing.two },
+    signInLinkText: {
+        color: AuthColors.darkGray,
+        fontSize: 16,
+        fontFamily: Poppins.regular,
+    },
+    signInLinkAccent: { color: AuthColors.main, textDecorationLine: "underline" },
+    disabled: { opacity: 0.6 },
 });
