@@ -1,4 +1,6 @@
-export const API_BASE = "https://boomerang-staging-bd7685105325.herokuapp.com/api";
+export const API_HOST = "boomerang-api.onrender.com";
+export const API_BASE = `https://${API_HOST}/api`;
+export const WS_BASE = `wss://${API_HOST}`;
 
 export async function apiRequest<T>({
     method,
@@ -21,6 +23,7 @@ export async function apiRequest<T>({
     });
 
     if (!response.ok) {
+        console.error(await response.json());
         throw new Error(`${response.status}`);
     }
 
