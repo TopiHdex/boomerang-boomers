@@ -17,7 +17,7 @@ import { PoliticasProteccionModal } from "@/components/politicas-proteccion";
 import { OrdersList } from "@/components/orders-list";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Spacing } from "@/constants/theme";
+import { Poppins, Spacing } from "@/constants/theme";
 import { useDriverAvailability } from "@/hooks/use-driver-availability";
 import { useOrders } from "@/hooks/use-orders";
 import { useTheme } from "@/hooks/use-theme";
@@ -182,6 +182,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: "#fff",
         fontSize: 16,
-        fontWeight: "600",
+        fontFamily: Poppins.semibold,
     },
 });

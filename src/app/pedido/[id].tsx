@@ -18,7 +18,7 @@ import { useApiClient } from "@/hooks/use-api";
 import { useTheme } from "@/hooks/use-theme";
 import { queryKeys } from "@/lib/query-keys";
 import type { Order, OrderStatus } from "@/types/order";
-import { Spacing } from "@/constants/theme";
+import { Poppins, Spacing } from "@/constants/theme";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -137,9 +137,9 @@ const mapStyles = StyleSheet.create({
         borderWidth: 1,
         alignItems: "center",
     },
-    appBtnText: { fontSize: 12, fontWeight: "500" },
+    appBtnText: { fontSize: 12, fontFamily: Poppins.medium },
     openBtn: { borderRadius: 10, paddingVertical: 10, alignItems: "center" },
-    openBtnText: { color: "#fff", fontSize: 14, fontWeight: "600" },
+    openBtnText: { color: "#fff", fontSize: 14, fontFamily: Poppins.semibold },
 });
 
 // ── StatusBadge (header right) ─────────────────────────────────────────────
@@ -155,7 +155,7 @@ function StatusBadge({ status }: { status: OrderStatus }) {
 
 const badgeStyles = StyleSheet.create({
     badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, marginRight: 4 },
-    text: { fontSize: 12, fontWeight: "600" },
+    text: { fontSize: 12, fontFamily: Poppins.semibold },
 });
 
 // ── Main screen ────────────────────────────────────────────────────────────
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     section: { borderRadius: 14, padding: Spacing.three, gap: Spacing.two },
     sectionHeader: {
         fontSize: 12,
-        fontWeight: "600",
+        fontFamily: Poppins.semibold,
         textTransform: "uppercase",
         letterSpacing: 0.5,
     },
@@ -421,13 +421,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     avatarText: { fontSize: 18 },
-    clientName: { fontSize: 15, fontWeight: "500" },
-    businessName: { fontSize: 16, fontWeight: "700" },
+    clientName: { fontSize: 15, fontFamily: Poppins.medium },
+    businessName: { fontSize: 16, fontFamily: Poppins.bold },
     businessAddr: { fontSize: 13 },
     lineItem: { flexDirection: "row", alignItems: "center", gap: 8 },
     itemQty: { fontSize: 13, minWidth: 28 },
     itemName: { flex: 1, fontSize: 13 },
-    itemPrice: { fontSize: 13, fontWeight: "500" },
+    itemPrice: { fontSize: 13, fontFamily: Poppins.medium },
     totalRow: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -435,11 +435,11 @@ const styles = StyleSheet.create({
         paddingTop: Spacing.two,
         marginTop: 4,
     },
-    totalLabel: { fontSize: 15, fontWeight: "700" },
-    totalVal: { fontSize: 15, fontWeight: "700" },
+    totalLabel: { fontSize: 15, fontFamily: Poppins.bold },
+    totalVal: { fontSize: 15, fontFamily: Poppins.bold },
     actionsContainer: { padding: Spacing.three, gap: Spacing.two, borderTopWidth: 1 },
     actionBtn: { borderRadius: 12, paddingVertical: 14, alignItems: "center" },
-    actionBtnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+    actionBtnText: { color: "#fff", fontSize: 16, fontFamily: Poppins.semibold },
     disabled: { opacity: 0.6 },
     completedBanner: {
         borderRadius: 12,
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#D4EDDA",
     },
-    completedText: { fontSize: 16, fontWeight: "600", color: "#155724" },
+    completedText: { fontSize: 16, fontFamily: Poppins.semibold, color: "#155724" },
     reportBtn: { borderRadius: 10, paddingVertical: 10, alignItems: "center", borderWidth: 1 },
     reportBtnText: { fontSize: 14 },
 });

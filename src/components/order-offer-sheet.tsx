@@ -12,7 +12,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import Svg, { Circle } from "react-native-svg";
 
-import { Spacing } from "@/constants/theme";
+import { Poppins, Spacing } from "@/constants/theme";
 import { useApiClient } from "@/hooks/use-api";
 import { useTheme } from "@/hooks/use-theme";
 import type { OrderOffer } from "@/types/order";
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     },
     badgeText: {
         fontSize: 12,
-        fontWeight: "700",
+        fontFamily: Poppins.bold,
         letterSpacing: 1,
     },
     topRow: {
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     },
     businessName: {
         fontSize: 22,
-        fontWeight: "700",
+        fontFamily: Poppins.bold,
     },
     ringWrap: {
         width: 120,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     },
     ringNum: {
         fontSize: 28,
-        fontWeight: "700",
+        fontFamily: Poppins.bold,
     },
     ringSec: {
         fontSize: 12,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     },
     stopAddr: {
         fontSize: 14,
-        fontWeight: "500",
+        fontFamily: Poppins.medium,
     },
     routeConnector: {
         width: 2,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     },
     statVal: {
         fontSize: 18,
-        fontWeight: "700",
+        fontFamily: Poppins.bold,
     },
     statKey: {
         fontSize: 12,
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     rejectText: {
         color: "#ef4444",
         fontSize: 16,
-        fontWeight: "600",
+        fontFamily: Poppins.semibold,
     },
     acceptBtn: {
         flex: 1,
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
     acceptText: {
         color: "#fff",
         fontSize: 16,
-        fontWeight: "600",
+        fontFamily: Poppins.semibold,
     },
     disabledBtn: {
         opacity: 0.6,

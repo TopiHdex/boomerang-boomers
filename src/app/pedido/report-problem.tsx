@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { useTheme } from "@/hooks/use-theme";
-import { Spacing } from "@/constants/theme";
+import { Poppins, Spacing } from "@/constants/theme";
 
 const PROBLEMS = [
     "Espera larga",
@@ -100,5 +100,5 @@ const styles = StyleSheet.create({
     footer: { padding: Spacing.three },
     submitBtn: { borderRadius: 12, paddingVertical: 14, alignItems: "center" },
     submitBtnDisabled: { opacity: 0.4 },
-    submitBtnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+    submitBtnText: { color: "#fff", fontSize: 16, fontFamily: Poppins.semibold },
 });
