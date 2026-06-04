@@ -4,7 +4,7 @@ import { useAuth } from "@clerk/expo";
 import * as Location from "expo-location";
 import * as SecureStore from "expo-secure-store";
 
-import { LOCATION_TASK_NAME, TOKEN_STORE_KEY } from "@/tasks/location";
+import { LOCATION_TASK_NAME, stopLocationUpdates, TOKEN_STORE_KEY } from "@/tasks/location";
 
 export function useLocationTracking() {
     const { getToken, isSignedIn } = useAuth();
@@ -43,18 +43,7 @@ export function useLocationTracking() {
         }
     }, [syncToken]);
 
-    const stopTracking = useCallback(async () => {
-        try {
-            const running = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-            if (running) {
-                await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
-            }
-        } catch {
-            // Native task state may be ahead of JS context (hot reload, killed app).
-            // Safe to ignore — OS will clean up the task on next cold start.
-        }
-        await SecureStore.deleteItemAsync(TOKEN_STORE_KEY);
-    }, []);
+    const stopTracking = useCallback(stopLocationUpdates, []);
 
     useEffect(() => {
         if (!isSignedIn) return;
