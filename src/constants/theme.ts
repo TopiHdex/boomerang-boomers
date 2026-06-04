@@ -69,3 +69,33 @@ export const Spacing = {
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
+
+export const Radius = {
+    sm: 8,
+    md: 10,
+    lg: 14,
+    xl: 46,
+} as const;
+
+// Poppins families, one per weight (custom fonts ignore fontWeight in RN).
+export const Poppins = {
+    regular: "Poppins_400Regular",
+    medium: "Poppins_500Medium",
+    semibold: "Poppins_600SemiBold",
+    bold: "Poppins_700Bold",
+} as const;
+
+// Flat palette for the auth screens. Brand color is green for this (driver) app.
+export const AuthColors = {
+    main: "#34C64C",
+    mainDark: "#228132",
+    background: "#F8FAFB",
+    white: "#FFFFFF",
+    font: "#1E1E1E",
+    gray: "#848484",
+    lightGray: "#DEDEDE",
+    darkGray: "#4E4E4E",
+    redBg: "#FCDEE2",
+    redFont: "#BE3B38",
+    redOutline: "#E9ACAB",
+} as const;
