@@ -10,9 +10,9 @@ export default function TabLayout() {
         <NativeTabs
             backgroundColor={colors.background}
             indicatorColor={colors.accent}
-            tintColor={colors.accentDark}
+            tintColor={colors.accent}
             rippleColor={colors.accentLight}
-            labelStyle={{ selected: { color: colors.accentDark } }}
+            labelStyle={{ selected: { color: colors.accent } }}
         >
             <NativeTabs.Trigger name="index">
                 <NativeTabs.Trigger.Label>Pedidos</NativeTabs.Trigger.Label>

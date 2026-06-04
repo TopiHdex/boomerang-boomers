@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "rea
 
 import { useRouter } from "expo-router";
 
+import { Poppins } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import type { Order, OrderStatus } from "@/types/order";
 
@@ -216,7 +217,7 @@ export function OrdersList({
 const styles = StyleSheet.create({
     container: { gap: 16 },
     section: { gap: 8 },
-    sectionTitle: { fontSize: 16, fontWeight: "700", marginBottom: 4 },
+    sectionTitle: { fontSize: 16, fontFamily: Poppins.bold, marginBottom: 4 },
     emptyState: { alignItems: "center", gap: 8, paddingVertical: 24 },
     emptyText: { fontSize: 14 },
     orderCard: {
@@ -231,22 +232,22 @@ const styles = StyleSheet.create({
         padding: 12,
     },
     headerContent: { flex: 1, gap: 2 },
-    orderTitle: { fontSize: 15, fontWeight: "600" },
+    orderTitle: { fontSize: 15, fontFamily: Poppins.semibold },
     orderDate: { fontSize: 12 },
     chevron: { fontSize: 12, paddingLeft: 8 },
     orderDetails: { paddingHorizontal: 12, paddingBottom: 12, gap: 8 },
     detailRow: { flexDirection: "row", alignItems: "center", gap: 8 },
     label: { fontSize: 13, flex: 1 },
-    value: { fontSize: 13, fontWeight: "500", textAlign: "right" },
+    value: { fontSize: 13, fontFamily: Poppins.medium, textAlign: "right" },
     statusBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
-    statusText: { fontSize: 12, fontWeight: "500" },
+    statusText: { fontSize: 12, fontFamily: Poppins.medium },
     itemsSection: { gap: 4 },
-    itemsTitle: { fontSize: 13, fontWeight: "600" },
+    itemsTitle: { fontSize: 13, fontFamily: Poppins.semibold },
     lineItem: { flexDirection: "row", alignItems: "center", gap: 6 },
     itemName: { flex: 1, fontSize: 13 },
     itemQty: { fontSize: 13 },
-    itemPrice: { fontSize: 13, fontWeight: "500" },
+    itemPrice: { fontSize: 13, fontFamily: Poppins.medium },
     detailBtn: { marginTop: 4, paddingVertical: 8, borderRadius: 8, alignItems: "center" },
-    detailBtnText: { fontSize: 14, fontWeight: "600" },
+    detailBtnText: { fontSize: 14, fontFamily: Poppins.semibold },
     moreOrders: { fontSize: 13, textAlign: "center", paddingTop: 4 },
 });

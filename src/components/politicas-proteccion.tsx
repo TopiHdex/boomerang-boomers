@@ -9,7 +9,7 @@ import {
     View,
 } from "react-native";
 
-import { Spacing } from "@/constants/theme";
+import { Poppins, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 
 const POLICIES = [
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 20,
-        fontWeight: "700",
+        fontFamily: Poppins.bold,
     },
     closeButton: {
         padding: Spacing.two,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     checkmark: {
         color: "#fff",
         fontSize: 13,
-        fontWeight: "700",
+        fontFamily: Poppins.bold,
     },
     label: {
         fontSize: 15,
@@ -205,6 +205,6 @@ const styles = StyleSheet.create({
     acceptText: {
         color: "#fff",
         fontSize: 16,
-        fontWeight: "600",
+        fontFamily: Poppins.semibold,
     },
 });
