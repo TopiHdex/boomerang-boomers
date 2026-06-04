@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -21,17 +22,35 @@ import { useDriverAvailability } from "@/hooks/use-driver-availability";
 import { useOrders } from "@/hooks/use-orders";
 import { useTheme } from "@/hooks/use-theme";
 
+const REFRESH_COOLDOWN_MS = 5000;
+
 export default function PedidosScreen() {
     const colors = useTheme();
     const { isAvailable, isLoading, isToggling, toggleAvailability } = useDriverAvailability();
     const [showPolicies, setShowPolicies] = useState(false);
-    const { activeOrders, orderHistory, isLoading: isOrdersLoading, refetch } = useOrders(true);
+    const { activeOrders, orderHistory, isLoading: isOrdersLoading, refetch } = useOrders();
+
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const lastRefreshRef = useRef(0);
 
     useFocusEffect(
         useCallback(() => {
             refetch();
         }, [refetch]),
     );
+
+    // Manual pull-to-refresh, throttled so users can't spam the endpoint.
+    const handleRefresh = useCallback(async () => {
+        const now = Date.now();
+        if (now - lastRefreshRef.current < REFRESH_COOLDOWN_MS) return;
+        lastRefreshRef.current = now;
+        setIsRefreshing(true);
+        try {
+            await refetch();
+        } finally {
+            setIsRefreshing(false);
+        }
+    }, [refetch]);
 
     const handleToggle = () => {
         if (isAvailable) {
@@ -57,6 +76,14 @@ export default function PedidosScreen() {
                     style={styles.scroll}
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={isRefreshing}
+                            onRefresh={handleRefresh}
+                            tintColor={colors.accent}
+                            colors={[colors.accent]}
+                        />
+                    }
                 >
                     <ThemedText type="title">Administrador de pedidos</ThemedText>
 

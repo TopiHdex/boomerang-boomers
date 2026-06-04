@@ -1,43 +1,42 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback } from "react";
 
 import { useAuth } from "@clerk/expo";
+import { useQueries } from "@tanstack/react-query";
 
-import { apiRequest } from "@/lib/api";
+import { useApiClient } from "@/hooks/use-api";
+import { queryKeys } from "@/lib/query-keys";
 import type { Order } from "@/types/order";
 
-export function useOrders(enabled: boolean) {
-    const { getToken } = useAuth();
-    const getTokenRef = useRef(getToken);
-    getTokenRef.current = getToken;
+export function useOrders() {
+    const request = useApiClient();
+    const { isSignedIn } = useAuth();
 
-    const [activeOrders, setActiveOrders] = useState<Order[]>([]);
-    const [orderHistory, setOrderHistory] = useState<Order[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [active, history] = useQueries({
+        queries: [
+            {
+                queryKey: queryKeys.orders.active,
+                queryFn: () => request<Order[]>({ method: "GET", path: "/driver/orders/active/" }),
+                enabled: !!isSignedIn,
+            },
+            {
+                queryKey: queryKeys.orders.history,
+                queryFn: () => request<Order[]>({ method: "GET", path: "/driver/orders/history/" }),
+                enabled: !!isSignedIn,
+            },
+        ],
+    });
 
-    const fetchOrders = useCallback(async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const token = await getTokenRef.current();
-            if (!token) return;
-            const [active, history] = await Promise.all([
-                apiRequest<Order[]>({ method: "GET", path: "/driver/orders/active/", token }),
-                apiRequest<Order[]>({ method: "GET", path: "/driver/orders/history/", token }),
-            ]);
-            setActiveOrders(Array.isArray(active) ? active : []);
-            setOrderHistory(Array.isArray(history) ? history : []);
-        } catch {
-            setError("Error al cargar pedidos.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, []); // stable — getToken accessed via ref
+    const activeRefetch = active.refetch;
+    const historyRefetch = history.refetch;
+    const refetch = useCallback(async () => {
+        await Promise.all([activeRefetch(), historyRefetch()]);
+    }, [activeRefetch, historyRefetch]);
 
-    useEffect(() => {
-        if (!enabled) return;
-        fetchOrders();
-    }, [enabled, fetchOrders]);
-
-    return { activeOrders, orderHistory, isLoading, error, refetch: fetchOrders };
+    return {
+        activeOrders: active.data ?? [],
+        orderHistory: history.data ?? [],
+        isLoading: active.isLoading || history.isLoading,
+        error: active.isError || history.isError ? "Error al cargar pedidos." : null,
+        refetch,
+    };
 }

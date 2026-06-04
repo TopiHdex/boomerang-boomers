@@ -1,59 +1,39 @@
-import { useCallback, useEffect, useState } from "react";
-
 import { useAuth } from "@clerk/expo";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { apiRequest } from "@/lib/api";
+import { useApiClient } from "@/hooks/use-api";
+import { queryKeys } from "@/lib/query-keys";
 
 interface DriverAvailability {
     is_available: boolean;
 }
 
 export function useDriverAvailability() {
-    const { getToken } = useAuth();
-    const [isAvailable, setIsAvailable] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isToggling, setIsToggling] = useState(false);
+    const request = useApiClient();
+    const queryClient = useQueryClient();
+    const { isSignedIn } = useAuth();
 
-    const fetchAvailability = useCallback(async () => {
-        try {
-            const token = await getToken();
-            if (!token) return;
-            const data = await apiRequest<DriverAvailability>({
-                method: "GET",
+    const query = useQuery({
+        queryKey: queryKeys.availability,
+        queryFn: () =>
+            request<DriverAvailability>({ method: "GET", path: "/driver/availability/" }),
+        enabled: !!isSignedIn,
+    });
+
+    const mutation = useMutation({
+        mutationFn: (available: boolean) =>
+            request<DriverAvailability>({
+                method: "PATCH",
                 path: "/driver/availability/",
-                token,
-            });
-            setIsAvailable(data.is_available);
-        } catch {
-            // silently fail on initial fetch
-        } finally {
-            setIsLoading(false);
-        }
-    }, [getToken]);
+                data: { is_available: available },
+            }),
+        onSuccess: (data) => queryClient.setQueryData(queryKeys.availability, data),
+    });
 
-    const toggleAvailability = useCallback(
-        async (available: boolean) => {
-            setIsToggling(true);
-            try {
-                const token = await getToken();
-                if (!token) return;
-                const data = await apiRequest<DriverAvailability>({
-                    method: "PATCH",
-                    path: "/driver/availability/",
-                    token,
-                    data: { is_available: available },
-                });
-                setIsAvailable(data.is_available);
-            } finally {
-                setIsToggling(false);
-            }
-        },
-        [getToken],
-    );
-
-    useEffect(() => {
-        fetchAvailability();
-    }, [fetchAvailability]);
-
-    return { isAvailable, isLoading, isToggling, toggleAvailability };
+    return {
+        isAvailable: query.data?.is_available ?? false,
+        isLoading: query.isLoading,
+        isToggling: mutation.isPending,
+        toggleAvailability: mutation.mutateAsync,
+    };
 }

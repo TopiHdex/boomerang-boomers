@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -11,11 +11,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useAuth } from "@clerk/expo";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
+import { useApiClient } from "@/hooks/use-api";
 import { useTheme } from "@/hooks/use-theme";
-import { apiRequest } from "@/lib/api";
+import { queryKeys } from "@/lib/query-keys";
 import type { Order, OrderStatus } from "@/types/order";
 import { Spacing } from "@/constants/theme";
 
@@ -164,72 +165,49 @@ export default function PedidoDetalleScreen() {
     const orderId = Number(id);
     const router = useRouter();
     const colors = useTheme();
-    const { getToken } = useAuth();
-    const getTokenRef = useRef(getToken);
-    getTokenRef.current = getToken;
+    const request = useApiClient();
+    const queryClient = useQueryClient();
 
-    const [order, setOrder] = useState<Order | null>(null);
-    const [business, setBusiness] = useState<Business | null>(null);
-    const [client, setClient] = useState<UserPublicInfo | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isUpdating, setIsUpdating] = useState(false);
+    const orderQuery = useQuery({
+        queryKey: queryKeys.order(orderId),
+        queryFn: () => request<Order>({ method: "GET", path: `/order/${orderId}/` }),
+    });
+    const order = orderQuery.data ?? null;
 
-    const fetchDetail = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const token = await getTokenRef.current();
-            if (!token) return;
-            const fetchedOrder = await apiRequest<Order>({
-                method: "GET",
-                path: `/order/${orderId}/`,
-                token,
-            });
-            setOrder(fetchedOrder);
-            const [fetchedBusiness, fetchedClient] = await Promise.all([
-                apiRequest<Business>({
-                    method: "GET",
-                    path: `/business/${fetchedOrder.business}/`,
-                    token,
-                }),
-                apiRequest<UserPublicInfo>({
-                    method: "GET",
-                    path: `/users/${fetchedOrder.client}/public/`,
-                    token,
-                }),
-            ]);
-            setBusiness(fetchedBusiness);
-            setClient(fetchedClient);
-        } catch {
-            Alert.alert("Error", "No se pudo cargar el pedido.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, [orderId]);
+    const businessQuery = useQuery({
+        queryKey: queryKeys.business(order?.business ?? 0),
+        queryFn: () => request<Business>({ method: "GET", path: `/business/${order!.business}/` }),
+        enabled: order?.business != null,
+    });
+    const business = businessQuery.data ?? null;
+
+    const clientQuery = useQuery({
+        queryKey: queryKeys.userPublic(order?.client ?? 0),
+        queryFn: () =>
+            request<UserPublicInfo>({ method: "GET", path: `/users/${order!.client}/public/` }),
+        enabled: order?.client != null,
+    });
+    const client = clientQuery.data ?? null;
+
+    const updateMutation = useMutation({
+        mutationFn: (status: OrderStatus) =>
+            request<Order>({ method: "PATCH", path: `/order/${orderId}/`, data: { status } }),
+        onSuccess: (updated) => {
+            queryClient.setQueryData(queryKeys.order(orderId), updated);
+            // Status changes move the order between active/history lists.
+            queryClient.invalidateQueries({ queryKey: queryKeys.orders.all });
+        },
+        onError: () => Alert.alert("Error", "Error al actualizar el estado."),
+    });
+    const isUpdating = updateMutation.isPending;
 
     useEffect(() => {
-        fetchDetail();
-    }, [fetchDetail]);
+        if (orderQuery.isError) Alert.alert("Error", "No se pudo cargar el pedido.");
+    }, [orderQuery.isError]);
 
-    const updateStatus = async (status: OrderStatus) => {
-        const token = await getTokenRef.current();
-        if (!token || !order) return;
-        setIsUpdating(true);
-        try {
-            const updated = await apiRequest<Order>({
-                method: "PATCH",
-                path: `/order/${orderId}/`,
-                token,
-                data: { status },
-            });
-            setOrder(updated);
-        } catch {
-            Alert.alert("Error", "Error al actualizar el estado.");
-        } finally {
-            setIsUpdating(false);
-        }
-    };
+    const updateStatus = (status: OrderStatus) => updateMutation.mutate(status);
 
-    if (isLoading) {
+    if (orderQuery.isLoading) {
         return (
             <>
                 <Stack.Screen options={{ title: "Cargando..." }} />

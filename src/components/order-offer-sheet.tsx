@@ -9,12 +9,12 @@ import {
     View,
 } from "react-native";
 
-import { useAuth } from "@clerk/expo";
+import { useMutation } from "@tanstack/react-query";
 import Svg, { Circle } from "react-native-svg";
 
 import { Spacing } from "@/constants/theme";
+import { useApiClient } from "@/hooks/use-api";
 import { useTheme } from "@/hooks/use-theme";
-import { apiRequest } from "@/lib/api";
 import type { OrderOffer } from "@/types/order";
 
 const RING_R = 52;
@@ -27,8 +27,15 @@ interface Props {
 
 export function OrderOfferSheet({ offer, onResponded }: Props) {
     const colors = useTheme();
-    const { getToken } = useAuth();
-    const [isResponding, setIsResponding] = useState(false);
+    const request = useApiClient();
+
+    const respondMutation = useMutation({
+        mutationFn: (action: "accept" | "reject") =>
+            request({ method: "POST", path: `/driver/offers/${offer.id}/`, data: { action } }),
+        onSuccess: () => onResponded(),
+        onError: () => Alert.alert("Error", "Error al responder. Inténtalo nuevamente."),
+    });
+    const isResponding = respondMutation.isPending;
 
     const expiresAt = new Date(offer.expires_at).getTime();
     const initialTime = useRef(Math.max(1, Math.floor((expiresAt - Date.now()) / 1000)));
@@ -52,24 +59,7 @@ export function OrderOfferSheet({ offer, onResponded }: Props) {
     const dashOffset = RING_C * (1 - ratio);
     const ringColor = ratio > 0.5 ? colors.accent : ratio > 0.25 ? "#f97316" : "#ef4444";
 
-    const respond = async (action: "accept" | "reject") => {
-        setIsResponding(true);
-        try {
-            const token = await getToken();
-            if (!token) return;
-            await apiRequest({
-                method: "POST",
-                path: `/driver/offers/${offer.id}/`,
-                token,
-                data: { action },
-            });
-            onResponded();
-        } catch {
-            Alert.alert("Error", "Error al responder. Inténtalo nuevamente.");
-        } finally {
-            setIsResponding(false);
-        }
-    };
+    const respond = (action: "accept" | "reject") => respondMutation.mutate(action);
 
     return (
         <Modal
