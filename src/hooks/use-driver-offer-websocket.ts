@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@clerk/expo";
+import { useQuery } from "@tanstack/react-query";
 
-import { apiRequest, WS_BASE } from "@/lib/api";
+import { useApiClient } from "@/hooks/use-api";
+import { WS_BASE } from "@/lib/api";
+import { queryKeys } from "@/lib/query-keys";
 import type { OrderOffer } from "@/types/order";
 
 enum MessageType {
@@ -23,28 +26,18 @@ interface OfferCanceledMessage {
 type DriverOfferMessage = NewOfferMessage | OfferCanceledMessage;
 
 export function useDriverOfferWebSocket() {
-    const { getToken, isSignedIn } = useAuth();
+    const { isSignedIn } = useAuth();
+    const request = useApiClient();
     const [offer, setOffer] = useState<OrderOffer | null>(null);
-    const [userId, setUserId] = useState<number | null>(null);
     const [reconnectTick, setReconnectTick] = useState(0);
     const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    useEffect(() => {
-        if (!isSignedIn) return;
-        getToken()
-            .then((token) => {
-                if (!token) return;
-                return apiRequest<{ user_id: number }>({
-                    method: "GET",
-                    path: "/me/",
-                    token,
-                });
-            })
-            .then((data) => {
-                if (data) setUserId(data.user_id);
-            })
-            .catch(() => {});
-    }, [isSignedIn, getToken]);
+    const { data: me } = useQuery({
+        queryKey: queryKeys.me,
+        queryFn: () => request<{ user_id: number }>({ method: "GET", path: "/me/" }),
+        enabled: !!isSignedIn,
+    });
+    const userId = me?.user_id ?? null;
 
     useEffect(() => {
         if (!userId) return;
@@ -52,10 +45,8 @@ export function useDriverOfferWebSocket() {
         let active = true;
 
         const ws = new WebSocket(`${WS_BASE}/ws/drivers/${userId}/offers/`);
-        console.log({ ws });
 
         ws.onmessage = (event) => {
-            console.log({ event });
             if (!active) return;
             try {
                 const data = JSON.parse(event.data as string) as DriverOfferMessage;
@@ -78,7 +69,6 @@ export function useDriverOfferWebSocket() {
 
         return () => {
             active = false;
-            console.log("=======\nClosing!\n=======");
             if (reconnectTimer.current) clearTimeout(reconnectTimer.current);
             ws.close();
         };
